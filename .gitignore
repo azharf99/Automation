@@ -1,0 +1,6 @@
+nilai-harian.xlsx
+nilai-pts.xlsx
+.env
+node_modules/
+env/
+__pycache__/
