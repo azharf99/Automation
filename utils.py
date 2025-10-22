@@ -119,9 +119,14 @@ class GradeAutomator:
         """Fills the grades for each student on the 'nilai-harian-input' page."""
         print("Waiting for the student list to load...")
         try:
-            WebDriverWait(self.driver, 20).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, "form[action*='kbmnilaiinputproses']"))
-            )
+            if self.assessment_type == "harian":
+                WebDriverWait(self.driver, 20).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, "form[action*='kbmnilaiinputproses']"))
+                )
+            else:
+                WebDriverWait(self.driver, 20).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, "form[action*='kbmnilaiinputpstsproses']"))
+                )
             print("Student list loaded. Filling grades...")
         except TimeoutException:
             print("Could not find the student grades form. The previous step might have failed.")
@@ -143,7 +148,7 @@ class GradeAutomator:
             try:
                 student_id = filtered_df.iloc[i].iloc[2]
                 grade = filtered_df.iloc[i].iloc[5]
-                self.driver.find_element(By.ID, f"nilai{student_id}").send_keys(str(grade))
+                self.driver.find_element(By.ID, f"nilai{student_id}").send_keys(str(round(grade)))
                 self.driver.find_element(By.ID, f"catatan{student_id}").send_keys("Entry by Azhar's Robot")
             except Exception as e:
                 print(f"Could not fill grade for student {i+1}. Error: {e}")
@@ -157,9 +162,14 @@ class GradeAutomator:
         """Updates the grades for each student on the 'kbmnilaiinputedit' page."""
         print("Waiting for the student list to load for editing...")
         try:
-            WebDriverWait(self.driver, 20).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, "form[action*='kbmnilaiinputeditproses']"))
-            )
+            if self.assessment_type == "harian":
+                WebDriverWait(self.driver, 20).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, "form[action*='kbmnilaiinputeditproses']"))
+                )
+            else:
+                WebDriverWait(self.driver, 20).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, "form[action*='kbmnilaiinputpstseditproses']"))
+                )
             print("Student list loaded for editing. Updating grades...")
         except TimeoutException:
             print("Could not find the student grades form for editing.")
@@ -182,10 +192,10 @@ class GradeAutomator:
                 grade = filtered_df.iloc[i].iloc[5]
                 grade_input = self.driver.find_element(By.NAME, f"nilai{student_id}")
                 grade_input.clear()
-                grade_input.send_keys(str(grade))
+                grade_input.send_keys(str(round(grade)))
                 notes_input = self.driver.find_element(By.NAME, f"catatan{student_id}")
                 notes_input.clear()
-                notes_input.send_keys("Entry updated by Automation")
+                notes_input.send_keys("Entry updated by Azhar Automation")
             except Exception as e:
                 print(f"Could not update grade for student {i+1}. Error: {e}")
 
