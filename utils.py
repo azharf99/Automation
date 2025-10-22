@@ -168,7 +168,7 @@ class GradeAutomator:
                 )
             else:
                 WebDriverWait(self.driver, 20).until(
-                    EC.presence_of_element_located((By.CSS_SELECTOR, "form[action*='kbmnilaiinputpstseditproses']"))
+                    EC.presence_of_element_located((By.CSS_SELECTOR, "form[action*='kbmnilaiinputeditpstsproses']"))
                 )
             print("Student list loaded for editing. Updating grades...")
         except TimeoutException:
@@ -222,10 +222,17 @@ class GradeAutomator:
                         self.driver.get(assessment_url)
                         
                         wait = WebDriverWait(self.driver, 10)
-                        edit_button = wait.until(EC.element_to_be_clickable((
-                            By.XPATH,
-                            f"//td[normalize-space(text())='{class_name}']/parent::tr//a[contains(@href, 'kbmnilaiinputedit')]"
-                        )))
+                        if self.assessment_type == "harian":
+                            edit_button = wait.until(EC.element_to_be_clickable((
+                                By.XPATH,
+                                f"//td[normalize-space(text())='{class_name}']/parent::tr//a[contains(@href, 'kbmnilaiinputedit')]"
+                            )))
+                        else:
+                            edit_button = wait.until(EC.element_to_be_clickable((
+                                By.XPATH,
+                                f"//td[normalize-space(text())='{class_name}']/parent::tr//a[contains(@href, 'kbmnilaiinputpstsedit')]"
+                            )))
+                        
                         self.driver.execute_script("arguments[0].click();", edit_button)
                         self._update_student_grades(numbers, class_name)
                     else:
