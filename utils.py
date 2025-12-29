@@ -18,6 +18,7 @@ load_dotenv()
 LOGIN_URL = os.getenv("LOGIN_URL")
 DASHBOARD_URL = os.getenv("DASHBOARD_URL")
 PHONE_NUMBER = os.getenv("PHONE_NUMBER")
+PASSWORD = os.getenv("PASSWORD")
 MATERIAL_NOTES = os.getenv("MATERIAL_NOTES")
 TEACHER_CODE = os.getenv("TEACHER_CODE")
 SUBJECT_NAME = os.getenv("SUBJECT_NAME")
@@ -72,6 +73,9 @@ class GradeAutomator:
         print(f"Entering phone number: {self.phone_number}")
         username_input = self.driver.find_element(By.ID, "nohp")
         username_input.send_keys(self.phone_number)
+        print(f"Entering password .......")
+        username_input = self.driver.find_element(By.ID, "password")
+        username_input.send_keys(PASSWORD)
 
         sign_in_button = self.driver.find_element(By.CSS_SELECTOR, "button[type='submit']")
         sign_in_button.click()
@@ -123,6 +127,10 @@ class GradeAutomator:
                 WebDriverWait(self.driver, 20).until(
                     EC.presence_of_element_located((By.CSS_SELECTOR, "form[action*='kbmnilaiinputproses']"))
                 )
+            elif self.assessment_type == "ikhtibar_nihaiy":
+                WebDriverWait(self.driver, 20).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, "form[action*='kbmnilaiinputpsastproses']"))
+                )
             else:
                 WebDriverWait(self.driver, 20).until(
                     EC.presence_of_element_located((By.CSS_SELECTOR, "form[action*='kbmnilaiinputpstsproses']"))
@@ -166,6 +174,10 @@ class GradeAutomator:
                 WebDriverWait(self.driver, 20).until(
                     EC.presence_of_element_located((By.CSS_SELECTOR, "form[action*='kbmnilaiinputeditproses']"))
                 )
+            elif self.assessment_type == "ikhtibar_nihaiy":
+                WebDriverWait(self.driver, 20).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, "form[action*='kbmnilaiinputeditpsastproses']"))
+                )
             else:
                 WebDriverWait(self.driver, 20).until(
                     EC.presence_of_element_located((By.CSS_SELECTOR, "form[action*='kbmnilaiinputeditpstsproses']"))
@@ -195,7 +207,7 @@ class GradeAutomator:
                 grade_input.send_keys(str(round(grade)))
                 notes_input = self.driver.find_element(By.NAME, f"catatan{student_id}")
                 notes_input.clear()
-                notes_input.send_keys("Entry updated by Azhar Automation")
+                notes_input.send_keys("")
             except Exception as e:
                 print(f"Could not update grade for student {i+1}. Error: {e}")
 
@@ -226,6 +238,11 @@ class GradeAutomator:
                             edit_button = wait.until(EC.element_to_be_clickable((
                                 By.XPATH,
                                 f"//td[normalize-space(text())='{class_name}']/parent::tr//a[contains(@href, 'kbmnilaiinputedit')]"
+                            )))
+                        elif self.assessment_type == "ikhtibar_nihaiy":
+                            edit_button = wait.until(EC.element_to_be_clickable((
+                                By.XPATH,
+                                f"//td[normalize-space(text())='{class_name}']/parent::tr//a[contains(@href, 'kbmnilaiinputpsastedit')]"
                             )))
                         else:
                             edit_button = wait.until(EC.element_to_be_clickable((
