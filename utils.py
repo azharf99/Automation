@@ -22,6 +22,7 @@ PASSWORD = os.getenv("PASSWORD")
 MATERIAL_NOTES = os.getenv("MATERIAL_NOTES")
 TEACHER_CODE = os.getenv("TEACHER_CODE")
 SUBJECT_NAME = os.getenv("SUBJECT_NAME")
+SUBJECT_PROPER_NAME = os.getenv("SUBJECT_PROPER_NAME")
 # ----------------------
 
 class GradeAutomator:
@@ -156,8 +157,9 @@ class GradeAutomator:
             try:
                 student_id = filtered_df.iloc[i].iloc[2]
                 grade = filtered_df.iloc[i].iloc[5]
+                notes = filtered_df.iloc[i].iloc[6]
                 self.driver.find_element(By.ID, f"nilai{student_id}").send_keys(str(round(grade)))
-                self.driver.find_element(By.ID, f"catatan{student_id}").send_keys("")
+                self.driver.find_element(By.ID, f"catatan{student_id}").send_keys(notes if pd.notna(notes) else "")
             except Exception as e:
                 print(f"Could not fill grade for student {i+1}. Error: {e}")
 
@@ -187,6 +189,10 @@ class GradeAutomator:
             print("Could not find the student grades form for editing.")
             return
 
+        materi = self.driver.find_element(By.NAME, "materi")
+        materi.clear()
+        materi.send_keys(self.material_notes)
+
         student_rows = self.driver.find_elements(By.CSS_SELECTOR, "form .row.mb-3.align-items-center")
         if not student_rows:
             print("No student rows found to update.")
@@ -202,12 +208,13 @@ class GradeAutomator:
             try:
                 student_id = filtered_df.iloc[i].iloc[2]
                 grade = filtered_df.iloc[i].iloc[5]
+                notes = filtered_df.iloc[i].iloc[6]
                 grade_input = self.driver.find_element(By.NAME, f"nilai{student_id}")
                 grade_input.clear()
                 grade_input.send_keys(str(round(grade)))
                 notes_input = self.driver.find_element(By.NAME, f"catatan{student_id}")
                 notes_input.clear()
-                notes_input.send_keys("")
+                notes_input.send_keys(notes if pd.notna(notes) else "")
             except Exception as e:
                 print(f"Could not update grade for student {i+1}. Error: {e}")
 
@@ -233,21 +240,30 @@ class GradeAutomator:
                         assessment_url = f"{self.assessment_url}?kdx={kdx}"
                         self.driver.get(assessment_url)
                         
-                        wait = WebDriverWait(self.driver, 10)
+                        wait = WebDriverWait(self.driver, 5)
+                        search_input = wait.until(EC.visibility_of_element_located((
+                            By.CSS_SELECTOR,
+                            "input[type='search'][aria-controls='tabelNilaiHarian']"
+                        )))
+                        search_input.clear()
+                        search_input.send_keys(f"{class_name}")
+                        wait = WebDriverWait(self.driver, 5)
+
+
                         if self.assessment_type == "harian":
                             edit_button = wait.until(EC.element_to_be_clickable((
                                 By.XPATH,
-                                f"//td[normalize-space(text())='{class_name}']/parent::tr//a[contains(@href, 'kbmnilaiinputedit')]"
+                                f"//tr[td[normalize-space()='{class_name}'] and td[normalize-space()='{SUBJECT_PROPER_NAME}']]//a[contains(@href, 'kbmnilaiinputedit')]"
                             )))
                         elif self.assessment_type == "ikhtibar_nihaiy":
                             edit_button = wait.until(EC.element_to_be_clickable((
                                 By.XPATH,
-                                f"//td[normalize-space(text())='{class_name}']/parent::tr//a[contains(@href, 'kbmnilaiinputpsastedit')]"
+                                f"//tr[td[normalize-space()='{class_name}'] and td[normalize-space()='{SUBJECT_PROPER_NAME}']]//a[contains(@href, 'kbmnilaiinputpsastedit')]"
                             )))
                         else:
                             edit_button = wait.until(EC.element_to_be_clickable((
                                 By.XPATH,
-                                f"//td[normalize-space(text())='{class_name}']/parent::tr//a[contains(@href, 'kbmnilaiinputpstsedit')]"
+                                f"//tr[td[normalize-space()='{class_name}'] and td[normalize-space()='{SUBJECT_PROPER_NAME}']]//a[contains(@href, 'kbmnilaiinputpstsedit')]"
                             )))
                         
                         self.driver.execute_script("arguments[0].click();", edit_button)
