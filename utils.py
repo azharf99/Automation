@@ -74,7 +74,7 @@ class GradeAutomator:
         username_input = self.driver.find_element(By.ID, "nohp")
         username_input.send_keys(self.phone_number)
         print(f"Entering password .......")
-        username_input = self.driver.find_element(By.ID, "password")
+        username_input = self.driver.find_element(By.NAME, "password")
         username_input.send_keys(PASSWORD)
 
         sign_in_button = self.driver.find_element(By.CSS_SELECTOR, "button[type='submit']")
@@ -157,7 +157,7 @@ class GradeAutomator:
                 student_id = filtered_df.iloc[i].iloc[2]
                 grade = filtered_df.iloc[i].iloc[5]
                 self.driver.find_element(By.ID, f"nilai{student_id}").send_keys(str(round(grade)))
-                self.driver.find_element(By.ID, f"catatan{student_id}").send_keys("Entry by Azhar's Robot")
+                self.driver.find_element(By.ID, f"catatan{student_id}").send_keys("")
             except Exception as e:
                 print(f"Could not fill grade for student {i+1}. Error: {e}")
 

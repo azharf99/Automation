@@ -6,3 +6,4 @@ nilai-pts-pjok.xlsx
 node_modules/
 env/
 __pycache__/
+*.xlsx
